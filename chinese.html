@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>七年級國文科線上測驗</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 使用 Inter 字體作為主要字體 */
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f7f9fb;
+        }
+        /* 自訂選項樣式 */
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .option-label:hover {
+            background-color: #e0f2fe; /* Light blue on hover */
+        }
+        .correct-answer {
+            background-color: #d1fae5; /* Green for correct */
+            border: 2px solid #10b981;
+            font-weight: 600;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2; /* Red for incorrect */
+            border: 2px solid #ef4444;
+            font-weight: 600;
+        }
+        .user-selected {
+            background-color: #bfdbfe; /* Blue for user selection */
+        }
+        .question-number {
+            min-width: 2.5rem; /* Ensure consistent spacing */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- 標題區塊 -->
+        <header class="text-center bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                新北市立中山國民中學 113學年度第二學期七年級第三次段考國文科試題
+            </h1>
+            <p class="text-md text-gray-600 mt-2">※綜合選擇題 (每題 2.5 分，共 40 題)</p>
+        </header>
+
+        <!-- 測驗內容區塊 -->
+        <div id="quiz-container" class="space-y-6">
+            <!-- 題目將由 JavaScript 載入此處 -->
+        </div>
+
+        <!-- 提交按鈕與結果區塊 -->
+        <div class="mt-10 pt-6 border-t border-gray-300">
+            <button id="submit-button" onclick="checkAnswers()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300">
+                送出並批改試卷
+            </button>
+
+            <div id="results" class="mt-8 p-6 bg-white rounded-xl shadow-lg hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">批改結果</h2>
+                <p id="score-display" class="text-xl font-semibold text-blue-600">您的得分：</p>
+                <div id="feedback-area" class="mt-4 space-y-3">
+                    <!-- 批改詳細資訊將顯示在此處 -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            // 基礎測驗
+            { qNum: 1, question: "下列選項「」中的字，何組字音相同？", options: { "A": "「供」桌／提「供」", "B": "「掙」錢／「掙」扎", "C": "「轉」圈／「轉」變", "D": "瓦「礫」／土「礫」" }, answer: "B", section: "一、基礎測驗" },
+            { qNum: 2, question: "下列選項「」中的注音，何組字形相同？", options: { "A": "鶴「ㄌㄧˋ」雲端／暴「ㄌㄧˋ」之氣", "B": "群山萬「ㄏㄨㄛˋ」／欲深谿「ㄏㄨㄛˋ」", "C": "「ㄏㄨㄟˋ」質蘭心／銘謝「ㄏㄨㄟˋ」顧", "D": "高風「ㄐㄧㄥˋ」節／不「ㄐㄧㄥˋ」而走" }, answer: "D" },
+            { qNum: 3, question: "下列選項「」中的字，何組意義相同？", options: { "A": "另闢蹊「徑」／羊腸小「徑」", "B": "無「微」不至／具體而「微」", "C": "「仰」天長嘯／受人景「仰」", "D": "「嶄」露頭角／「嶄」新生活" }, answer: "A" },
+            { qNum: 4, question: "下列選項「」中的注釋，何者為非？", options: { "A": "項為之「強」：強壯", "B": "「徐」噴以煙：慢慢地", "C": "「布」好菜肴：安排、擺設", "D": "織「就」：完成" }, answer: "A" },
+            { qNum: 5, question: "關於《負荷》一詩的解讀，下列何者正確？", options: { "A": "「有時，一株油麻菜花，便足以讓母親溫馨的回味」：油麻菜花指鄉野間的平凡景色，讓母親回憶起過去的美好時光。", "B": "「母親的愛，是一本經常讀誦的經文，是一座取之不盡的寶藏」：以比喻手法讚頌母愛的偉大和無私，且是具有宗教意涵的。", "C": "「而我的感激，總在不言中」：雖未明說，但子女對母親的愛是深刻且不朽的，此處「感激」包含對母愛所給予的「負荷」與「壓力」。", "D": "詩中以「負荷」為題，主要在呈現「父母與子女間的親情代代相傳」的內涵。" }, answer: "C" },
+            { qNum: 6, question: "下列詩句所描寫的景象，何者可看出「季節」的變化？", options: { "A": "蟬噪林逾靜，鳥鳴山更幽", "B": "秋風起兮白雲飛，草木黃落兮雁南歸", "C": "採菊東籬下，悠然見南山", "D": "月落烏啼霜滿天，江楓漁火對愁眠" }, answer: "B" },
+            { qNum: 7, question: "下列「」中的詞語，何者使用恰當？", options: { "A": "他個性開朗，樂於助人，頗得師長「心悅誠服」", "B": "他說話做事常常「殫精竭慮」，導致朋友都對他敬而遠之", "C": "為了尋求真相，警方決定「一字不漏」對證人進行問話", "D": "他們兄弟倆感情「手足情深」，總是彼此扶持，共同面對挑戰" }, answer: "D" },
+            { qNum: 8, question: "下列關於各課文句的說明，何者正確？", options: { "A": "《兒時記趣》：「明察秋毫」指的是視力良好", "B": "《雅量》：「人人都喜歡聽好話」是作者最主要想表達的觀點", "C": "《雅量》：「因為心裡的『花朵』開放，才看得見世界的美麗」意指心態影響看待事物的方式", "D": "《負荷》：「我們是您身上、手臂上、眼裡的負荷」意指子女是父母沈重的經濟負擔" }, answer: "C" },
+            { qNum: 9, question: "下列選項中，何者最能凸顯作者的「好奇心」與「童趣」？", options: { "A": "故時有物外之趣", "B": "昂首觀之，項為之強", "C": "以叢草為林，蟲蟻為獸", "D": "徐噴以煙，使之沖煙飛去" }, answer: "C" },
+            { qNum: 10, question: "下列選項中，何者的句子使用了「映襯」的修辭法？", options: { "A": "成功是失敗的總和", "B": "有志者事竟成", "C": "莫忘在花草之間也曾經有我們嬉戲的足跡", "D": "他的心像一塊粗礪的石頭，無法感受他人的溫暖" }, answer: "A" },
+            { qNum: 11, question: "《雅量》一文提到：「我們來看這一幅畫時，很自然地投射了自己的觀點，同時也聽到別人的觀點。」這段話的意旨，下列何者正確？", options: { "A": "世界上的事物都只有單一的樣貌", "B": "學習接納自己與他人的不同意見", "C": "人人都是一樣的，都能欣賞藝術品", "D": "應尊重個人經驗所產生的價值觀" }, answer: "D" },
+            { qNum: 12, question: "關於《動物啟示錄》一文的說明，下列何者正確？", options: { "A": "文中透過「鹿」的啟示，提醒人類要保持警覺", "B": "作者認為「人類」與「動物」最大的差別在於「動物」有本能，而「人類」有理性", "C": "本文旨在闡述「動物」比「人類」更為高尚", "D": "作者以「寓言」手法，藉由「動物」行為反思「人類」處境" }, answer: "B" },
+            { qNum: 13, question: "關於《兒時記趣》一文的敘述，下列何者正確？", options: { "A": "作者童年時的生活是富裕且無憂無慮的", "B": "「以土礫凸者為丘，凹者為壑」採用聽覺摹寫", "C": "「留蚊於素帳中」的目的是為了觀察蚊子的動態", "D": "作者用「物外之趣」來形容童年遊戲的快樂" }, answer: "C" },
+            { qNum: 14, question: "判斷下列對聯所歌詠的對象，何者說明正確？", options: { "A": "鐵肩擔道義，妙手著文章：比喻醫生醫術高明", "B": "萬里長城猶在，不見當年秦始皇：比喻時光飛逝，景物依舊", "C": "出師未捷身先死，長使英雄淚滿襟：歌詠諸葛亮鞠躬盡瘁的忠心", "D": "功蓋三分國，名成八陣圖：歌詠曹操治國平天下的功績" }, answer: "C" },
+            { qNum: 15, question: "「只有啟程，才會到達理想的目的地；只有奮鬥，才會使人生的路更寬廣。」這段話的含義，與下列何者最接近？", options: { "A": "人生沒有不勞而獲的成功", "B": "過程比結果更重要", "C": "成功取決於天賦與努力", "D": "鼓勵人們勇敢追逐夢想" }, answer: "D" },
+            { qNum: 16, question: "下列文句中，何者使用「倒反」的修辭法？", options: { "A": "聽你這一番話，真是讓我茅塞頓開", "B": "他這個人真是「可愛」，走到哪裡都只會闖禍", "C": "這位畫家畫技高超，簡直是登峰造極", "D": "他長得高頭大馬，卻膽小如鼠" }, answer: "A" }, // 依照提供的答案鍵
+            { qNum: 17, question: "下列文句「」中的詞語，何者沒有冗言贅字？", options: { "A": "在大庭廣眾「之下」說話，要特別注意禮節", "B": "這件事情的「來龍去脈」經過，老師都清楚了", "C": "他在比賽時表現「優越超群」，得到評審一致肯定", "D": "他把「所有一切」的財產都捐給了慈善機構" }, answer: "D" },
+            { qNum: 18, question: "下列關於「字音」的判斷，何組前後相同？", options: { "A": "「供」桌／提「供」：ㄍㄨㄥ／ㄍㄨㄥ", "B": "「掙」錢／「掙」扎：ㄓㄥˋ／ㄓㄥ", "C": "「轉」圈／「轉」變：ㄓㄨㄢˇ／ㄓㄨㄢˋ", "D": "瓦「礫」／土「礫」：ㄌㄜˋ／ㄌㄧˋ" }, answer: "B" },
+            { qNum: 19, question: "下列關於「字形」的判斷，何組前後相同？", options: { "A": "鶴「ㄌㄧˋ」雲端／暴「ㄌㄧˋ」之氣：厲／戾", "B": "群山萬「ㄏㄨㄛˋ」／欲深谿「ㄏㄨㄛˋ」：壑／壑", "C": "「ㄏㄨㄟˋ」質蘭心／銘謝「ㄏㄨㄟˋ」顧：蕙／惠", "D": "高風「ㄐㄧㄥˋ」節／不「ㄐㄧㄥˋ」而走：競／脛" }, answer: "C" },
+            { qNum: 20, question: "下列選項中的「望」，何者當「看」或「看見」解釋？", options: { "A": "登高「望」遠", "B": "聲「望」很高", "C": "德高「望」重", "D": "鄉里「望」族" }, answer: "A" },
+            // 閱讀測驗 (一) 《記承天寺夜遊》節錄
+            { qNum: 21, question: "下列對於「欣然起行」的解讀，何者正確？", options: { "A": "「欣然」指心情愉悅，對夜遊充滿期待", "B": "「起行」指起身出門，是夜遊的起點", "C": "「欣然起行」是描寫月色極美，使人不禁起身", "D": "「欣然起行」指夜遊的過程非常快樂" }, answer: "B", section: "二、閱讀測驗 (一) 《記承天寺夜遊》節錄" },
+            { qNum: 22, question: "「庭下如積水空明，水中藻荇交橫，蓋竹柏影也。」這句話的敘述，下列何者正確？", options: { "A": "月光映照，庭院如積水清澈透明", "B": "藻荇交橫是實景描寫，竹柏影是虛景", "C": "以積水清澈來形容月光之美", "D": "藻荇交橫是竹柏的影子，是虛實相映的描寫" }, answer: "D" },
+            { qNum: 23, question: "「何夜無月？何處無竹柏？」的語氣，與下列何者相同？", options: { "A": "誰說人生沒有希望？", "B": "你怎麼可以這樣對待我？", "C": "我真希望你能成功", "D": "失敗為成功之母" }, answer: "A" },
+            { qNum: 24, question: "作者稱自己與張懷民為「閑人」，其用意下列何者正確？", options: { "A": "描寫自己閒情逸致，不受拘束", "B": "表達對當時仕途失意，有懷才不遇的無奈", "C": "凸顯自己與張懷民是與眾不同的", "D": "暗諷世人汲汲營營於名利，不懂得欣賞月色" }, answer: "B" },
+            { qNum: 25, question: "關於《記承天寺夜遊》的寫作手法，下列何者正確？", options: { "A": "首段記述了夜遊的地點、景物和過程", "B": "庭中景致以視覺摹寫描繪出水中映月的絕妙景色", "C": "結合敘事、寫景、抒情於一文，情景交融，思鄉情濃", "D": "「閑人」一詞一語雙關，蘊含弦外之音" }, answer: "D" },
+            // 閱讀測驗 (二)
+            { qNum: 26, question: "關於光線的敘述，下列何者正確？", options: { "A": "光線是一種電磁波，以直線傳播", "B": "光線傳播的速度非常慢，每秒約 $30$ 萬公里", "C": "透明的物體會吸收光線，不透明的物體會反射光線", "D": "我們看見物體，是因為光線被物體吸收" }, answer: "A", section: "二、閱讀測驗 (二) 關於光線的文章" },
+            { qNum: 27, question: "根據本文，我們能分辨物體的不同，最主要的原因是什麼？", options: { "A": "我們的眼睛構造特殊", "B": "物體有不同的形狀和大小", "C": "光線射到物體上，被吸收或反射的程度不同", "D": "物體本身的顏色就不同" }, answer: "C" },
+            { qNum: 28, question: "如果我們看到一本書是黃色的，這代表這本書的表面？", options: { "A": "吸收了黃色的光線，反射了其他顏色的光線", "B": "吸收了所有的光線，反射了黃色的光線", "C": "反射了黃色的光線，吸收了其他顏色的光線", "D": "反射了所有的光線，吸收了黃色的光線" }, answer: "C" },
+            { qNum: 29, question: "下列關於「顏色」的敘述，何者正確？", options: { "A": "白色會吸收所有的光線", "B": "黑色會反射所有的光線", "C": "物體的顏色是固定不變的", "D": "顏色是物體反射光線所產生的結果" }, answer: "D" },
+            // 閱讀測驗 (三)
+            { qNum: 30, question: "本文主要在敘述什麼？", options: { "A": "阿基米德如何解決國王的難題", "B": "阿基米德如何發現浮力原理", "C": "阿基米德的生平事蹟", "D": "阿基米德在數學、物理學和工程學上的成就" }, answer: "B", section: "二、閱讀測驗 (三) 阿基米德" },
+            { qNum: 31, question: "國王懷疑金匠偷工減料，其原因最可能是：", options: { "A": "皇冠的體積比等重的純金大", "B": "皇冠的體積比等重的純銀小", "C": "皇冠的重量比等重的純金輕", "D": "皇冠的重量比等重的純銀重" }, answer: "A" },
+            { qNum: 32, question: "阿基米德發現浮力原理，是在什麼樣的情境下？", options: { "A": "在實驗室中進行實驗", "B": "在浴缸中洗澡", "C": "在街上奔跑", "D": "在宮殿中思考" }, answer: "B" },
+            { qNum: 33, question: "阿基米德大喊「我找到了！」（Eureka！）最主要的原因是？", options: { "A": "找到了失蹤的皇冠", "B": "解決了國王的難題", "C": "證明了金匠的清白", "D": "發現了浮力原理" }, answer: "D" },
+            // 閱讀測驗 (四)
+            { qNum: 34, question: "根據本文，科學家發現許多動物也擁有複雜的情感和認知能力，下列何者為非？", options: { "A": "大象會為死去的同伴舉行儀式，並在同伴的骨骸旁流連忘返", "B": "黑猩猩會使用工具，進行複雜的社交行為", "C": "鳥類會記住食物的藏匿地點，並進行精密的導航", "D": "動物的情感和認知能力與人類完全相同" }, answer: "A", section: "二、閱讀測驗 (四) 動物啟示錄" }, // 依照提供的答案鍵
+            { qNum: 35, question: "作者認為人類應該放下人類中心的觀點，其原因下列何者最接近？", options: { "A": "人類是地球上眾多生命中的一員", "B": "人類的文明發展已經帶來許多問題", "C": "應以更謙卑的態度看待動物，尊重牠們的生命與情感", "D": "動物與自然共存的智慧值得人類學習" }, answer: "C" },
+            { qNum: 36, question: "作者認為人類應該學習動物與自然共存的智慧，其目的是什麼？", options: { "A": "避免人類文明的崩解", "B": "以更永續的方式生活，解決環境問題", "C": "尊重動物的生命與情感", "D": "凸顯動物比人類更為高尚" }, answer: "B" },
+            { qNum: 37, question: "本文最主要想表達的觀點是？", options: { "A": "動物擁有複雜的情感和認知能力", "B": "人類應該放下人類中心的觀點", "C": "人類的文明發展帶來了許多問題", "D": "人類與動物應以更和諧的方式共存" }, answer: "D" },
+            // 閱讀測驗 (五)
+            { qNum: 38, question: "關於《記承天寺夜遊》的寫作手法，下列何者正確？ (此題疑似接續前面段落，但選項與前段落內容有關，故保留)", options: { "A": "首段記述了夜遊的地點、景物和過程", "B": "庭中景致以視覺摹寫描繪出水中映月的絕妙景色", "C": "結合敘事、寫景、抒情於一文，情景交融，思鄉情濃", "D": "「閑人」一詞一語雙關，蘊含弦外之音" }, answer: "D", section: "二、閱讀測驗 (五) 披頭四與五月天" },
+            { qNum: 39, question: "根據上文所述，下列何者最能凸顯披頭四和五月天的成功之道？", options: { "A": "擁有獨特的創作天分", "B": "累積大量實戰經驗，體悟表演真諦", "C": "得到夜總會老闆的賞識", "D": "團員間的感情深厚，合作無間" }, answer: "B" },
+            { qNum: 40, question: "文中畫底線處「甲」最適合填入下列哪一句話？", options: { "A": "努力與實力是成功的基石", "B": "機會是留給準備好的人", "C": "創新是藝術的靈魂", "D": "時代的潮流無法抵擋" }, answer: "A" }
+        ];
+
+        // 閱讀測驗的原文 (為避免介面過於混亂，僅呈現題目，原文需使用者參照原文件或自行補上)
+        const readingPassages = {
+            "二、閱讀測驗 (一) 《記承天寺夜遊》節錄": "月色入戶，欣然起行。念無與樂者，遂至承天寺尋張懷民。懷民亦未寢，相與步於中庭。庭下如積水空明，水中藻荇交橫，蓋竹柏影也。何夜無月？何處無竹柏？但少閑人如吾兩人者耳。",
+            "二、閱讀測驗 (二) 關於光線的文章": "世人對於自己所看見的東西，往往覺得理所當然，很少想到其所以然；我們每天走在路上，眼睛看見的東西何止千萬，為什麼我們會對它們產生感覺，而能分辨它們的不同呢？這一切都和光線有關，如果沒有光，我們就看不見任何東西。光是一種電磁波，它以直線傳播，傳播的速度非常快，每秒約 30 萬公里。光線射到物體上，如果物體是透明的，光線就會穿透過去，我們就看不見該物體；如果物體是不透明的，光線就會被物體吸收或反射，我們就看見該物體。我們看見的顏色，則是因為物體將某些顏色的光線吸收，某些顏色的光線反射出來，而反射出來的光線進入我們的眼睛，我們就看見了該物體所反射的顏色。例如：我們看到蘋果是紅色的，是因為蘋果吸收了光線中的綠、藍、黃等顏色，只反射了紅色的光線。如果物體反射了所有的光線，我們就看到白色；如果物體吸收了所有的光線，我們就看到黑色。",
+            "二、閱讀測驗 (三) 阿基米德": "阿基米德是古希臘著名的數學家、物理學家和工程師。他曾在洗澡時，發現了浮力原理，並大喊：「我找到了！我找到了！」（Eureka！）。根據歷史記載，敘拉古的國王請金匠打造一頂純金的皇冠，但國王懷疑金匠偷工減料，用銀來取代部分黃金。於是，國王請阿基米德找出真相。阿基米德冥思苦想，始終找不到解決的辦法。直到有一天，他在浴缸洗澡時，發現水面會隨著他進入浴缸而上升。他突然想到，如果皇冠是純金的，在水中排開的水量應該和等重的純金排開的水量相同；如果皇冠摻了銀，由於銀的密度比金小，等重的銀體積比金大，排開的水量就會比較多。他立刻從浴缸跳出來，跑到街上大喊：「我找到了！我找到了！」阿基米德的發現，不僅解決了國王的難題，也為後人留下了寶貴的科學遺產。",
+            "二、閱讀測驗 (四) 動物啟示錄": "我們總是將心靈、情感視為獨一無二的人類特權，但科學家發現，許多動物也擁有複雜的情感和認知能力。例如：大象會為死去的同伴舉行儀式，並在同伴的骨骸旁流連忘返；黑猩猩會使用工具，進行複雜的社交行為；鳥類會記住食物的藏匿地點，並進行精密的導航。這些動物的行為，讓我們開始思考「人類」與「動物」的界線。或許，人類並不特別，我們只是地球上眾多生命中的一員。我們應該放下人類中心的觀點，以更謙卑的態度看待動物，尊重牠們的生命與情感。人類的文明發展，往往以「征服自然」為目標，但這樣的發展模式，也帶來了環境污染、氣候變遷等問題。我們應該學習動物與自然共存的智慧，以更永續的方式生活。尊重動物的生命，也是尊重人類自己。因為，我們都生活在同一個地球上，我們都是大自然的一部分。",
+            "二、閱讀測驗 (五) 披頭四與五月天": "披頭四（The Beatles）是英國最有名的搖滾樂團，由四個高中生組成，成立於 1960 年。當時，德國漢堡有個夜總會老闆，邀請他們在店裡做不間斷的演出，隨時吸引客人，於是披頭四開始在漢堡一些夜總會表演。披頭四的主唱兼吉他手約翰藍儂（John Lennon）表示：「表演常常一連演唱八小時，因此不得不找出新的表演方式，以免觀眾看膩了。我們非常賣力，把心和靈魂都放進歌曲裡。」在夜總會超過 1200 場的現場演出，他們學到的不只是表演功力和舞臺經驗，而且體悟「表演必須吸引人、感動人」的道理。 1963 年，披頭四從德國紅回英國，次年又席捲美國，「披頭熱」從此全面展開。臺灣的五月天開始也是高中學生樂團，他們同樣會創作、懂表演，也總是想找出更動人、更新的表演方式，因此不但在臺灣極受歡迎，在大陸、日本、新加坡、馬來西亞，甚至美國、加拿大，都累積了許多死忠的歌迷。五月天的成功，證明了 甲 是不變的道理。"
+        };
+
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsDiv = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const feedbackArea = document.getElementById('feedback-area');
+        const totalQuestions = quizData.length;
+        const scorePerQuestion = 2.5;
+
+        let currentSection = "";
+
+        // 動態生成試卷內容
+        function renderQuiz() {
+            let html = '';
+            quizData.forEach((item, index) => {
+                // 檢查是否需要新增 Section Header
+                if (item.section && item.section !== currentSection) {
+                    html += `<div class="bg-gray-200 text-gray-800 p-3 mt-8 mb-4 rounded-lg font-bold text-lg shadow-inner">${item.section}</div>`;
+                    currentSection = item.section;
+                    // 如果是閱讀測驗，加上文章內容
+                    if (readingPassages[item.section]) {
+                        html += `<div class="bg-yellow-50 p-4 mb-4 rounded-lg border-l-4 border-yellow-400 text-sm text-gray-700 whitespace-pre-wrap">${readingPassages[item.section]}</div>`;
+                    }
+                }
+
+                html += `
+                    <div id="q-${item.qNum}" class="question-block bg-white p-5 rounded-xl shadow-md border border-gray-100">
+                        <p class="text-gray-900 font-semibold mb-3 flex items-start">
+                            <span class="question-number text-blue-600 mr-3">${item.qNum}.</span>
+                            <span>${item.question}</span>
+                        </p>
+                        <div class="space-y-2 pl-6">
+                `;
+                
+                // 選項
+                const optionsKeys = Object.keys(item.options);
+                optionsKeys.forEach(key => {
+                    const optionId = `q${item.qNum}-${key}`;
+                    html += `
+                        <label for="${optionId}" class="option-label text-gray-700 hover:shadow-sm">
+                            <input type="radio" id="${optionId}" name="q${item.qNum}" value="${key}" class="mr-3 text-blue-600 focus:ring-blue-500 transition duration-150 ease-in-out" onclick="highlightSelection(${item.qNum}, '${key}')">
+                            <span class="font-medium mr-2">${key}</span>：${item.options[key]}
+                        </label>
+                    `;
+                });
+
+                html += `
+                        </div>
+                        <div id="feedback-${item.qNum}" class="mt-3 text-sm font-medium hidden"></div>
+                    </div>
+                `;
+            });
+            quizContainer.innerHTML = html;
+        }
+
+        // 當選項被點擊時，高亮選中的選項
+        function highlightSelection(qNum, selectedKey) {
+            const questionBlock = document.getElementById(`q-${qNum}`);
+            // 移除所有選項的背景色
+            questionBlock.querySelectorAll('.option-label').forEach(label => {
+                label.classList.remove('user-selected');
+            });
+
+            // 為選中的選項添加背景色
+            const selectedInput = document.getElementById(`q${qNum}-${selectedKey}`);
+            if (selectedInput) {
+                selectedInput.closest('.option-label').classList.add('user-selected');
+            }
+        }
+
+        // 批改答案
+        function checkAnswers() {
+            let score = 0;
+            feedbackArea.innerHTML = '';
+            resultsDiv.classList.remove('hidden');
+
+            quizData.forEach(item => {
+                const questionBlock = document.getElementById(`q-${item.qNum}`);
+                const userAnswer = document.querySelector(`input[name="q${item.qNum}"]:checked`)?.value;
+                const correctAnswer = item.answer;
+                const feedbackDiv = document.getElementById(`feedback-${item.qNum}`);
+
+                // 重置樣式
+                questionBlock.querySelectorAll('.option-label').forEach(label => {
+                    label.classList.remove('correct-answer', 'incorrect-answer', 'user-selected');
+                });
+                feedbackDiv.classList.add('hidden');
+                
+                let isCorrect = false;
+
+                if (userAnswer) {
+                    // 顯示使用者選擇的標記
+                    const selectedLabel = document.querySelector(`label[for="q${item.qNum}-${userAnswer}"]`);
+                    if (selectedLabel) {
+                         selectedLabel.classList.add('user-selected');
+                    }
+
+                    if (userAnswer === correctAnswer) {
+                        score += scorePerQuestion;
+                        isCorrect = true;
+                        feedbackDiv.innerHTML = `<span class="text-green-600">✅ 正確！</span>`;
+                    } else {
+                        feedbackDiv.innerHTML = `<span class="text-red-600">❌ 錯誤！您的選擇是 ${userAnswer}。</span>`;
+                    }
+                } else {
+                    feedbackDiv.innerHTML = `<span class="text-gray-500">未作答。</span>`;
+                }
+                
+                // 顯示正確答案的標記
+                const correctLabel = document.querySelector(`label[for="q${item.qNum}-${correctAnswer}"]`);
+                if (correctLabel) {
+                    correctLabel.classList.add('correct-answer');
+                }
+
+                // 如果答錯，將使用者選擇的選項標為錯誤
+                if (userAnswer && userAnswer !== correctAnswer) {
+                    const userSelectedLabel = document.querySelector(`label[for="q${item.qNum}-${userAnswer}"]`);
+                    if (userSelectedLabel) {
+                        userSelectedLabel.classList.remove('user-selected'); // 移除普通選中色
+                        userSelectedLabel.classList.add('incorrect-answer'); // 添加錯誤色
+                    }
+                }
+
+                feedbackDiv.classList.remove('hidden');
+                
+                // 在結果區顯示詳細回饋 (可選，這裡只顯示總分)
+            });
+
+            const finalScore = score.toFixed(1);
+            scoreDisplay.innerHTML = `您的得分：<span class="${score >= 60 ? 'text-green-600' : 'text-red-600'}">${finalScore}</span> 分 (總分 100 分)`;
+            
+            // 捲動到結果區塊
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 初始化
+        window.onload = renderQuiz;
+    </script>
+
+</body>
+</html>
+
