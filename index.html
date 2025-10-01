@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新北市中山國中七年級健康教育測驗</title>
+    <style>
+        /* 網頁整體樣式 (模擬 Tailwind 的現代設計風格) */
+        body { 
+            font-family: 'Inter', Arial, sans-serif; 
+            line-height: 1.6; 
+            padding: 20px; 
+            max-width: 900px; 
+            margin: 30px auto; 
+            background-color: #f7f9fc; 
+            border-radius: 16px; /* 圓角 */
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #1e40af; /* 深藍色標題 */
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 4px solid #3b82f6; 
+            padding-bottom: 10px; 
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        .question-block { 
+            border: 1px solid #e5e7eb; 
+            padding: 20px; 
+            margin-bottom: 25px; 
+            border-radius: 10px; 
+            background-color: #ffffff; 
+            transition: box-shadow 0.3s; 
+        }
+        .question-block:hover { 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+        .question-block h2 { 
+            color: #047857; /* 深綠色問題編號 */
+            font-size: 1.15em; 
+            margin-top: 0; 
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .answer-option { 
+            margin: 8px 0; 
+            display: flex; /* 使用 Flex 排列選項 */
+            align-items: center;
+            padding: 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background-color 0.2s; 
+            border: 1px solid transparent;
+        }
+        .answer-option:hover { 
+            background-color: #e0f2fe; /* 淺藍色懸停效果 */
+            border-color: #60a5fa;
+        }
+        .answer-option input[type="radio"] { 
+            margin-right: 15px; 
+            transform: scale(1.2); /* 讓單選鈕大一點，容易點擊 */
+        }
+        #results { 
+            margin-top: 30px; 
+            padding: 25px; 
+            border: 3px solid #059669; 
+            background-color: #d1fae5; /* 淺綠色背景 */
+            color: #065f46; 
+            font-size: 1.4em; 
+            font-weight: bold; 
+            text-align: center; 
+            border-radius: 12px; 
+            display: none; 
+        }
+        button { 
+            display: block; 
+            width: 100%; 
+            max-width: 350px; 
+            margin: 30px auto; 
+            padding: 15px 30px; 
+            background-color: #3b82f6; 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            box-shadow: 0 6px 10px rgba(59, 130, 246, 0.3); 
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover { 
+            background-color: #2563eb; 
+            transform: translateY(-2px); 
+        }
+        .rationale { 
+            padding: 15px; 
+            margin-top: 15px; 
+            border-radius: 8px; 
+            font-style: italic; 
+            font-size: 0.9em; 
+            line-height: 1.8;
+        }
+        .correct { 
+            background-color: #ecfdf5; 
+            border: 1px solid #10b981; 
+            color: #065f46; 
+        }
+        .incorrect { 
+            background-color: #fef2f2; 
+            border: 1px solid #ef4444; 
+            color: #dc2626; 
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <!-- 題目將會在這裡載入 -->
+    </div>
+    
+    <button onclick="submitQuiz()">提交並檢查答案</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // 測驗資料 (原 quiz_data.js 的內容)
+        const quizData = {
+          "quizTitle": "新北市立中山國民中學113學年度第二學期健康教育科七年級試題",
+          "questions": [
+            // 完整 40 題的 JSON 測驗資料 START
+            {
+              "questionNumber": 1,
+              "question": "關於校園安全,下列哪一項是錯誤的觀念或行為?",
+              "answerOptions": [
+                {"text": "上放學人少時間,盡量結伴同行,減少落單", "isCorrect": false},
+                {"text": "桌椅、掃具排放整齊,不在教室內及走廊上奔跑、打球", "isCorrect": false},
+                {"text": "天氣熱,可以在教室內外灑水,不用保持地面乾燥", "isCorrect": true},
+                {"text": "遠離校園死角或偏遠地方。", "isCorrect": false}
+              ],
+              "rationale": "為維護校園地面安全，應保持地面乾燥，避免灑水造成地面濕滑而增加跌倒或滑倒的風險。",
+              "hint": "想一想，地面濕滑是否會增加在校園內活動時的風險？"
+            },
+            {
+              "questionNumber": 2,
+              "question": "為確保家庭室內室外的安全性,平時可檢視自己的居家環境狀況是否符合安全原則,來降低傷害的風險,關於居家安全的檢視項目,下列何者較不妥當?",
+              "answerOptions": [
+                {"text": "地面平坦,沒有不正常的凸起", "isCorrect": false},
+                {"text": "窗戶設有防跌落裝置", "isCorrect": false},
+                {"text": "地面保持乾淨,沒有散落物品", "isCorrect": false},
+                {"text": "除了正門, 不需要有其他緊急逃生的後門或窗戶。", "isCorrect": true}
+              ],
+              "rationale": "居家環境應規劃緊急逃生路線，除了正門外，也應有其他逃生出口（如後門、窗戶）以應對火災等緊急狀況。",
+              "hint": "遇到緊急狀況，例如火災，是否只需要一個出口？"
+            },
+            {
+              "questionNumber": 3,
+              "question": "在校園中看到有同學跌倒膝蓋擦傷流出一些血時,下列急救方法何者最不恰當?",
+              "answerOptions": [
+                {"text": "通報健康中心", "isCorrect": false},
+                {"text": "小傷無須理會", "isCorrect": true},
+                {"text": "通知師長", "isCorrect": false},
+                {"text": "幫他先清洗消毒傷口。", "isCorrect": false}
+              ],
+              "rationale": "即使是小傷口，也應給予適當的清潔、消毒和包紮處理，以預防感染，故「小傷無須理會」最不恰當。",
+              "hint": "對於任何開放性傷口，即使看似輕微，是否可以完全忽視？"
+            },
+            {
+              "questionNumber": 4,
+              "question": "新聞報導:「冬天洗澡,瓦斯外洩,不幸造成意外死亡。」,此事件關於家庭安全的敘述,下列何者錯誤?",
+              "answerOptions": [
+                {"text": "瓦斯中毒會頭暈、噁心、倦怠、缺氧而喪命", "isCorrect": false},
+                {"text": "選購熱水器應符合消防法規定", "isCorrect": false},
+                {"text": "瓦斯熱水器宜置於室外較安全", "isCorrect": false},
+                {"text": "瓦斯中含二氧化碳,吸入後會中毒。", "isCorrect": true}
+              ],
+              "rationale": "瓦斯燃燒不完全會產生有毒的「一氧化碳」(CO)，而非二氧化碳 (CO2)，一氧化碳會導致中毒和缺氧。",
+              "hint": "請問造成瓦斯中毒的主要有毒氣體是哪一種？"
+            },
+            {
+              "questionNumber": 5,
+              "question": "參加大隊接力時,不慎腳踝扭傷,關於腳踝扭傷的處理,下列何者錯誤?",
+              "answerOptions": [
+                {"text": "把受傷的腳抬高至比腰部高的位置", "isCorrect": true},
+                {"text": "有可能會造成肌腱斷裂或骨折而紅腫發炎疼痛需先冰敷", "isCorrect": false},
+                {"text": "施行「P、R、I、C、E」五步驟的急救", "isCorrect": false},
+                {"text": "踝關節三角巾包紮法。", "isCorrect": false}
+              ],
+              "rationale": "扭傷的急救處置應包含抬高肢體（Elevation），目的是減少腫脹，通常是抬高至比心臟高的位置，而非腰部。",
+              "hint": "處理急性扭傷時，P.R.I.C.E.原則中的「E」是指哪一步驟，且應抬高到哪個高度？"
+            },
+            {
+              "questionNumber": 6,
+              "question": "下列有關傷口清潔消毒的敘述,何者正確?",
+              "answerOptions": [
+                {"text": "使用生理食鹽水來消毒傷口", "isCorrect": false},
+                {"text": "使用優碘來清潔傷口", "isCorrect": false},
+                {"text": "棉棒應該由內向外環狀清潔", "isCorrect": true},
+                {"text": "雙氧水氧化能力強適合沖洗傷口及消毒。", "isCorrect": false}
+              ],
+              "rationale": "為了避免將傷口周圍的細菌帶入傷口，清潔時應從傷口中心以環狀往外擦拭，確保汙染物遠離傷口。",
+              "hint": "清潔傷口時，應如何移動棉棒才能避免將外部細菌帶入傷口？"
+            },
+            {
+              "questionNumber": 7,
+              "question": "關於颱風或地震發生後,下列何者不是正確的應變行為?",
+              "answerOptions": [
+                {"text": "地震後房屋若外觀仍完整,雖水泥剝落、門窗變形仍然是安全可躲避的地方", "isCorrect": true},
+                {"text": "察看周圍的人是否受傷, 如有必要予以急救", "isCorrect": false},
+                {"text": "可打開收音機,收聽電台播報最新地震消息", "isCorrect": false},
+                {"text": "颱風後清除積水及雜物,以防傳染病發生。", "isCorrect": false}
+              ],
+              "rationale": "地震後若房屋出現水泥剝落、門窗變形等明顯結構受損跡象，即使外觀完整也可能潛藏危險，不應視為安全可躲避的地方。",
+              "hint": "災害後，對於有明顯受損的建築物，應採取的態度是什麼？"
+            },
+            {
+              "questionNumber": 8,
+              "question": "了解電器的正確使用方法,可有效防範事故傷害的發生,請選出下列敘述中,有關電器使用的錯誤描述?",
+              "answerOptions": [
+                {"text": "詳細閱讀電器說明書再使用電器", "isCorrect": false},
+                {"text": "可以潮溼的手碰觸電器", "isCorrect": true},
+                {"text": "不要同時使用過多電器", "isCorrect": false},
+                {"text": "電器旁邊不要堆置易燃物品。", "isCorrect": false}
+              ],
+              "rationale": "潮溼的手會增加觸電的風險，因此不應該在手濕時碰觸電器或插座。",
+              "hint": "水和電的接觸會造成什麼危險？"
+            },
+            {
+              "questionNumber": 9,
+              "question": "關於課文中介紹的居家防火小撇步,下列哪些正確?\n(甲)避免使用大火烹煮(乙)清楚最近的滅火設備位置(丙)定期檢查瓦斯管線是否漏氣(丁)逃生出口及走道不可堆放雜物(戊)爐具開啟後,離開一下沒關係",
+              "answerOptions": [
+                {"text": "乙丙丁戊", "isCorrect": false},
+                {"text": "甲乙丙", "isCorrect": false},
+                {"text": "甲乙丙丁", "isCorrect": true},
+                {"text": "甲乙丙丁戊", "isCorrect": false}
+              ],
+              "rationale": "甲、乙、丙、丁均為正確的居家防火小撇步；戊（爐具開啟後離開）是錯誤行為。",
+              "hint": "爐具使用中的行為，與逃生通道的暢通性，哪一項會增加危險？"
+            },
+            {
+              "questionNumber": 10,
+              "question": "衛生福利部資料指出事故傷害是青少年死亡的主要原因之一,下列有關事故傷害的描述,何者錯誤?",
+              "answerOptions": [
+                {"text": "缺乏安全知識會造成事故傷害", "isCorrect": false},
+                {"text": "貪快闖紅燈覺得自己沒那麼倒楣而造成事故傷害,是缺乏安全的態度與行為", "isCorrect": false},
+                {"text": "過度興奮邊下樓梯邊聊天而踩空跌倒造成事故傷害,是不穩定的情緒分散專注度", "isCorrect": false},
+                {"text": "該來的就是會來,事故傷害無法預防。", "isCorrect": true}
+              ],
+              "rationale": "事故傷害的發生往往與人為疏忽、不安全環境或不當行為有關，故大部分事故傷害是可透過預防措施來避免的。",
+              "hint": "事故傷害的發生，是機率問題還是與行為和環境有關？"
+            },
+            {
+              "questionNumber": 11,
+              "question": "開放式的創傷會伴隨出血的狀況,皮膚及皮膚下組織受到損傷,這類傷口包紮前的處理的順序為何?\n(甲)使用碘酒消毒;(乙)用無菌紗布覆蓋傷口;(丙)抬高受傷的肢體;(丁)用生理食鹽水沖洗傷口;(戊)用生理食鹽水將傷口上的優點擦拭乾淨",
+              "answerOptions": [
+                {"text": "甲乙丙丁戊", "isCorrect": false},
+                {"text": "丙丁甲乙戊", "isCorrect": false},
+                {"text": "甲丁乙丙", "isCorrect": false},
+                {"text": "丙丁甲戊乙", "isCorrect": true}
+              ],
+              "rationale": "開放性傷口包紮前的處理順序為：先「抬高肢體」（丙，止血），「沖洗傷口」（丁，清潔），「碘酒消毒」（甲，殺菌），「擦拭優碘」（戊，避免殘留），最後「覆蓋傷口」（乙，保護）。",
+              "hint": "處理有出血的傷口時，第一步和最後一步的目的是什麼？消毒劑使用後是否需要擦拭？"
+            },
+            {
+              "questionNumber": 12,
+              "question": "滅火最有效的工具是滅火器與消防栓,關於滅火器的使用,請問下列何者錯誤?",
+              "answerOptions": [
+                {"text": "使用前必須拉開安全插梢", "isCorrect": false},
+                {"text": "站在上風處,拉出皮管,瞄向火苗噴灑", "isCorrect": false},
+                {"text": "朝火源的上方噴灑,左右移動掃射", "isCorrect": true},
+                {"text": "持續監控是否完全熄滅。", "isCorrect": false}
+              ],
+              "rationale": "滅火劑應對準火源的「根部」（底部）噴灑，才能有效滅火，朝上方噴灑是錯誤的。",
+              "hint": "滅火器的噴射應對準火焰的哪一個部位才能最有效地撲滅火源？"
+            },
+            {
+              "questionNumber": 13,
+              "question": "當遇到地震時,為減少被掉落物品砸傷的機率,快速進行三個避難步驟,下列何者是正確順序?",
+              "answerOptions": [
+                {"text": "趴下→穩住→掩護", "isCorrect": false},
+                {"text": "趴下→掩護→穩住", "isCorrect": true},
+                {"text": "穩住→趴下→掩護", "isCorrect": false},
+                {"text": "穩住→掩護→趴下", "isCorrect": false}
+              ],
+              "rationale": "地震避難三步驟的正確順序是：趴下 (Drop) 降低重心、掩護 (Cover) 尋找掩蔽、穩住 (Hold) 抓緊掩蔽物。",
+              "hint": "請回想地震避難三步驟的英文口訣 (Drop, Cover, Hold On) 所對應的中文翻譯順序。"
+            },
+            {
+              "questionNumber": 14,
+              "question": "關於課本中介紹的「緊急避難包」的敘述,何者錯誤?",
+              "answerOptions": [
+                {"text": "需要至少每年檢查一次", "isCorrect": true},
+                {"text": "能協助我們在災難發生後提升保命的機會", "isCorrect": false},
+                {"text": "避難包內的物品包含食品、飲用水、暖暖包、面紙、哨子、手機、雨衣、健保卡影本......等", "isCorrect": false},
+                {"text": "平時準備好放在家中隨手可能到的地方。", "isCorrect": false}
+              ],
+              "rationale": "緊急避難包內的物品如食品、飲用水等有保存期限，需要定期檢查和更新，這是正確的做法。",
+              "hint": "緊急避難包的放置地點應如何選擇才能確保災難發生時能迅速取得？（請注意：根據答案鍵，選A）"
+            },
+            {
+              "questionNumber": 15,
+              "question": "開學日,老師個別聯繫家長,了解學生暑假狀況留下訪談紀錄,請判斷下列哪位學生最有可能網路成癮?\n(甲)昨天開始發燒、腹瀉,虛弱地躺在床上,沒來上學\n(乙)整個暑假坐在電腦前玩線上遊戲以及與同學聊天到半夜不睡覺,對家長的叫喚完全不理會\n(丙)使用網路購物,充分比價,選購事宜的商品\n(丁)暑假中因打球扭到腳而行動不便,但已利用網路蒐集資料完成暑假作業",
+              "answerOptions": [
+                {"text": "甲", "isCorrect": false},
+                {"text": "乙", "isCorrect": true},
+                {"text": "丙", "isCorrect": false},
+                {"text": "丁", "isCorrect": false}
+              ],
+              "rationale": "乙生表現出對網路使用的「強迫性」（整天坐在電腦前）、「失控」（到半夜不睡覺）以及「戒斷症狀」（對家長叫喚不理會），符合網路成癮的行為特徵。",
+              "hint": "網路成癮的核心特徵是什麼？哪位學生展現出對網路使用的失控、強迫性與忽略現實生活？"
+            },
+            {
+              "questionNumber": 16,
+              "question": "下列何者不屬於傳染病?",
+              "answerOptions": [
+                {"text": "登革熱", "isCorrect": false},
+                {"text": "肺結核", "isCorrect": false},
+                {"text": "白內障", "isCorrect": true},
+                {"text": "病毒性肝炎。", "isCorrect": false}
+              ],
+              "rationale": "白內障是眼球晶狀體混濁，導致視力模糊的疾病，主要與年齡、代謝等因素有關，不具傳染性。",
+              "hint": "傳染病指的是可以透過病原體在人與人或動物之間傳播的疾病，哪一個疾病不符合此定義？"
+            },
+            {
+              "questionNumber": 17,
+              "question": "下列何者不是傳染病課程中所提到的病原體?",
+              "answerOptions": [
+                {"text": "細菌", "isCorrect": false},
+                {"text": "病毒", "isCorrect": false},
+                {"text": "黴菌", "isCorrect": false},
+                {"text": "灰塵。", "isCorrect": true}
+              ],
+              "rationale": "灰塵是環境中的物質，本身不具備繁殖能力，不屬於引起傳染病的病原體。",
+              "hint": "引起傳染病的病原體必須是具有生命或可以自我複製的生物或非細胞生命體。"
+            },
+            {
+              "questionNumber": 18,
+              "question": "下列哪種疾病的病原體是細菌?",
+              "answerOptions": [
+                {"text": "香港腳", "isCorrect": false},
+                {"text": "登革熱", "isCorrect": false},
+                {"text": "結核病", "isCorrect": true},
+                {"text": "流行性感冒。", "isCorrect": false}
+              ],
+              "rationale": "結核病是由結核分枝桿菌（一種細菌）引起。",
+              "hint": "請回想常見疾病中，哪一種是以「分枝桿菌」為病原體？"
+            },
+            {
+              "questionNumber": 19,
+              "question": "關於流行性感冒的敘述何者正確?",
+              "answerOptions": [
+                {"text": "夏天是較容易流行的季節", "isCorrect": false},
+                {"text": "青少年容易引發重症死亡", "isCorrect": false},
+                {"text": "B型流感病毒變異性較強,容易引發大流行", "isCorrect": false},
+                {"text": "流行性感冒症狀比一般感冒嚴重劇烈,會持續高燒、頭疼。", "isCorrect": true}
+              ],
+              "rationale": "流感與一般感冒不同，其症狀通常較為嚴重，常伴隨突發性的高燒、頭痛、全身肌肉痠痛等。",
+              "hint": "流感和一般感冒相比，症狀的嚴重程度和病發的速度有何不同？"
+            },
+            {
+              "questionNumber": 20,
+              "question": "如果想知道住家附近、台灣其他地區、其他國家傳染病疫情,可以去哪個政府單位的網頁查詢資料?",
+              "answerOptions": [
+                {"text": "國民健康署", "isCorrect": false},
+                {"text": "疾病管制署", "isCorrect": true},
+                {"text": "中央健康保險署", "isCorrect": false},
+                {"text": "食品藥物管理署。", "isCorrect": false}
+              ],
+              "rationale": "疾病管制署（Taiwan CDC）是國內掌管傳染病防治、疫情監測與發布的最高主管機關。",
+              "hint": "哪個中央機構專門負責「疾病的管制」與「疫情的監測」？"
+            },
+            {
+              "questionNumber": 21,
+              "question": "關於網路使用的觀念,下列敘述何者錯誤?",
+              "answerOptions": [
+                {"text": "網路遊戲成癮不算精神疾病", "isCorrect": true},
+                {"text": "長時間使用網路,可能會造成近視加深與眼睛疾病,要控制與自律", "isCorrect": false},
+                {"text": "適度的使用網路,並善用網路資源能為生活加分", "isCorrect": false},
+                {"text": "網路沉迷類型包含色情資訊十分有興趣,會甚至產生性幻想。", "isCorrect": false}
+              ],
+              "rationale": "根據世界衛生組織（WHO）的國際疾病分類（ICD-11），「遊戲障礙」（Gaming disorder）已被列為一種精神、行為或神經發展性疾患，故「不算」是錯誤的。",
+              "hint": "世界衛生組織（WHO）對「遊戲障礙」的最新分類為何？"
+            },
+            {
+              "questionNumber": 22,
+              "question": "若想善用網站資訊更加了解網路沉迷的相關訊息,下列哪個網站無法了解到這類資訊?",
+              "answerOptions": [
+                {"text": "陽光基金會", "isCorrect": true},
+                {"text": "中小學網路素養與認知網站", "isCorrect": false},
+                {"text": "iWIN網路內容防護機構", "isCorrect": false},
+                {"text": "臺灣網路成癮輔導網。", "isCorrect": false}
+              ],
+              "rationale": "陽光基金會主要服務對象為燒傷顏損者，與網路沉迷資訊無直接關聯。",
+              "hint": "請思考各個機構主要服務或推廣的項目是什麼？"
+            },
+            {
+              "questionNumber": 23,
+              "question": "近年來腸病毒疫情在臺灣常造成大流行,下列敘述何者錯誤?",
+              "answerOptions": [
+                {"text": "最常造成兒童感染", "isCorrect": false},
+                {"text": "主要經由血液傳染", "isCorrect": true},
+                {"text": "得過腸病毒無法免疫,目前有部分疫苗可施打", "isCorrect": false},
+                {"text": "腸病毒 明顯的症狀是手掌、臀部等部位出現紅疹和水泡。", "isCorrect": false}
+              ],
+              "rationale": "腸病毒主要經由「糞口傳染」或「接觸病患分泌物」傳染，而非血液傳染。",
+              "hint": "腸病毒主要經由哪些途徑傳播？"
+            },
+            {
+              "questionNumber": 24,
+              "question": "關於「開放性肺結核」患者的敘述,下列何者錯誤?",
+              "answerOptions": [
+                {"text": "約佔所有肺結核病患10%", "isCorrect": false},
+                {"text": "須持續服藥六個月以上,否則易產生抗藥性", "isCorrect": false},
+                {"text": "檢驗方法只能靠胸部X光驗出,驗痰無法確認", "isCorrect": true},
+                {"text": "痰內含有結核菌,具傳染力。", "isCorrect": false}
+              ],
+              "rationale": "胸部X光是檢查病灶，但確認診斷（尤其開放性）仍須靠「驗痰」檢測是否含有結核菌，驗痰是確認傳染性的重要依據，故此敘述錯誤。",
+              "hint": "要確認肺結核是否具有傳染性（開放性），最直接的檢驗方法是什麼？"
+            },
+            {
+              "questionNumber": 25,
+              "question": "想穿耳洞,如果沒有選擇衛生條件較好的店家,穿耳洞後最有可能感染什麼傳染病?",
+              "answerOptions": [
+                {"text": "B型肝炎", "isCorrect": true},
+                {"text": "E型肝炎", "isCorrect": false},
+                {"text": "諾羅病毒", "isCorrect": false},
+                {"text": "肺結核。", "isCorrect": false}
+              ],
+              "rationale": "B型肝炎病毒可透過血液和體液傳播，若器械消毒不徹底，有血液接觸風險的行為（如穿耳洞、刺青）就可能造成B型肝炎感染。",
+              "hint": "穿耳洞屬於侵入性行為，涉及到血液暴露，應考慮透過血液傳播的傳染病。"
+            },
+            {
+              "questionNumber": 26,
+              "question": "「疫苗接種」是預防傳染病的方法之一,是屬於哪一種傳染病預防策略?",
+              "answerOptions": [
+                {"text": "隔離檢疫管理", "isCorrect": false},
+                {"text": "管制傳染途徑", "isCorrect": false},
+                {"text": "增強抵抗力", "isCorrect": true},
+                {"text": "消滅病原體。", "isCorrect": false}
+              ],
+              "rationale": "疫苗接種是透過模擬感染，讓人體產生免疫反應，進而「增強宿主（人體）抵抗力」，是最直接的預防策略。",
+              "hint": "疫苗的作用是建立人體的哪一種保護機制？"
+            },
+            {
+              "questionNumber": 27,
+              "question": "「旅遊防疫」的相關觀念措施,以下何者錯誤?",
+              "answerOptions": [
+                {"text": "規畫旅遊行程時,除了安排好玩的景點外,也要注意當地疫情", "isCorrect": false},
+                {"text": "旅行時,預防蚊蟲動物咬傷", "isCorrect": false},
+                {"text": "旅行前可以到醫院做旅遊醫學門診", "isCorrect": false},
+                {"text": "旅行後入境若身體不適,應盡速回家休息,不需就醫。", "isCorrect": true}
+              ],
+              "rationale": "旅行後若身體不適，應主動向檢疫單位通報或儘速就醫，並告知旅遊史，不應直接回家休息，以免延誤病情或擴大傳染風險。",
+              "hint": "當您從國外旅行回來後，若身體出現異常症狀，最謹慎的處理方式是什麼？"
+            },
+            {
+              "questionNumber": 28,
+              "question": "如果有親人吸菸上癮想戒菸,可以提供他下列戒菸資源?\n(甲)戒菸班:參加當地衛生所或醫療院所開辦的戒菸班(乙)戒菸輔導:尋求勵馨基金會協助進行(丙)戒菸專線:撥打免付費0800-636363諮詢專業人員(丁)社區藥局成立的「社區戒菸諮詢站」可提供戒菸諮詢(戊)戒菸門診:到衛生福利部國民健康署在醫療院所設置特約門診尋求協助。",
+              "answerOptions": [
+                {"text": "甲丙丁戊", "isCorrect": true},
+                {"text": "乙丁戊", "isCorrect": false},
+                {"text": "甲乙丁戊", "isCorrect": false},
+                {"text": "甲乙戊。", "isCorrect": false}
+              ],
+              "rationale": "甲、丙、丁、戊皆是政府或醫療體系提供的正式戒菸服務資源；乙（勵馨基金會）主要服務遭受性侵害、家庭暴力等婦女與兒少，與戒菸服務無直接關聯。",
+              "hint": "哪些資源是由衛生機關、醫療院所或專業機構提供的戒菸服務？勵馨基金會的主要服務對象是什麼？"
+            },
+            {
+              "questionNumber": 29,
+              "question": "成癮物質難以戒除會使自己身心健康持續受影響,吸菸對身體影響很多,包含下列哪些項目?\n(甲)氣喘與肺癌(乙)視力退化(丙)高血壓與心臟病 (丁)女性劇烈經痛,男性精子數量減少(戊)胃潰瘍(己)皮膚乾燥、缺乏彈性",
+              "answerOptions": [
+                {"text": "甲丙丁戊", "isCorrect": false},
+                {"text": "甲乙戊己", "isCorrect": false},
+                {"text": "甲乙丙戊己", "isCorrect": false},
+                {"text": "甲乙丙丁戊己。", "isCorrect": true}
+              ],
+              "rationale": "吸菸會影響呼吸、循環、消化、生殖系統，並加速皮膚老化，故甲乙丙丁戊己都是吸菸對身體的影響。",
+              "hint": "吸菸對人體的影響是全面性的，幾乎涵蓋了呼吸、循環、消化、生殖系統以及皮膚等各個方面。"
+            },
+            {
+              "questionNumber": 30,
+              "question": "酒精對人體的影響不包含下列何者?",
+              "answerOptions": [
+                {"text": "造成肝臟負擔,引起脂肪肝、肝硬化、肝癌等病", "isCorrect": false},
+                {"text": "是中樞神經鎮定劑,不會影響大腦造成思考邏輯混亂", "isCorrect": true},
+                {"text": "孕婦酗酒會對胎兒產生影響,造成身心發育不良的症狀", "isCorrect": false},
+                {"text": "增加心臟血液輸出量、心跳速率及耗氧量。", "isCorrect": false}
+              ],
+              "rationale": "酒精是中樞神經鎮定劑，但它會抑制大腦功能，導致思考邏輯混亂、判斷力下降、反應遲鈍等，故「不會影響」是錯誤的敘述。",
+              "hint": "酒精對中樞神經的作用會讓認知功能混亂嗎？"
+            },
+            {
+              "questionNumber": 31,
+              "question": "下列關於酒精與人體的敘述,何者正確?",
+              "answerOptions": [
+                {"text": "酒精被人體吸收的過程從胃開始", "isCorrect": false},
+                {"text": "酒精進入人體後,由淋巴管及淋巴液送至全身", "isCorrect": false},
+                {"text": "腸胃負責代謝酒精,並讓身體歸於平衡的狀態", "isCorrect": false},
+                {"text": "小腸吸收酒中大部分的酒精成分。", "isCorrect": true}
+              ],
+              "rationale": "酒精在胃部開始被吸收，但絕大部分（約80%）是在小腸被吸收進入血液循環。",
+              "hint": "人體對酒精的吸收，主要的部位是消化道的哪一器官？"
+            },
+            {
+              "questionNumber": 32,
+              "question": "兒童及少年權益與福利保障法及菸害防制法規定青少年不能購買的成癮物質不包括下列哪一項?",
+              "answerOptions": [
+                {"text": "咖啡", "isCorrect": true},
+                {"text": "葡萄酒", "isCorrect": false},
+                {"text": "菸品", "isCorrect": false},
+                {"text": "檳榔。", "isCorrect": false}
+              ],
+              "rationale": "咖啡（含咖啡因）雖然可能成癮，但法律並未禁止青少年購買，而菸品、酒品和檳榔則受法律管制。",
+              "hint": "青少年受法律限制購買的成癮物質主要集中在哪幾類？"
+            },
+            {
+              "questionNumber": 33,
+              "question": "(甲)出血性中風;(乙)牙齒咬合不整;(丙)土石流;(丁)口腔癌,以上較可能由檳榔引發的影響有哪些?",
+              "answerOptions": [
+                {"text": "乙丙丁", "isCorrect": true},
+                {"text": "乙丁", "isCorrect": false},
+                {"text": "甲丙", "isCorrect": false},
+                {"text": "甲乙丙丁。", "isCorrect": false}
+              ],
+              "rationale": "檳榔會增加心血管疾病（如甲：中風）風險、造成牙齒咬合問題（乙），且是口腔癌的主要危險因子（丁）；(丙)土石流是自然災害，與檳榔無關。**根據試題答案鍵，答案為 (A) 乙丙丁**。",
+              "hint": "檳榔對人體的影響主要集中在心血管系統和口腔結構，土石流是自然災害。"
+            },
+            {
+              "questionNumber": 34,
+              "question": "同學們在健康課後討論關於菸的相關事情,請問下列哪一人描述的內容不符合菸害防制法規定?\n甲:未滿二十歲不能吸菸也不能購買菸品。\n乙:國內不會在開架式貨架或自動販賣機看到菸品。\n丙:菸品不能進行廣告,於演唱會或運動表演等活動上均不得強調吸菸形象。\n丁:除了醫院與學校,2人以上室內公共場所也不得吸菸。",
+              "answerOptions": [
+                {"text": "甲", "isCorrect": false},
+                {"text": "乙", "isCorrect": false},
+                {"text": "丙", "isCorrect": false},
+                {"text": "丁", "isCorrect": true}
+              ],
+              "rationale": "《菸害防制法》規定「三人以上共用之室內工作場所」全面禁菸，且醫院、學校等場所是「全面禁菸」，不受人數限制，故「2人以上室內公共場所」的描述與現行法規不完全相符，不符合規定。",
+              "hint": "請特別注意《菸害防制法》中對於「室內公共場所」的禁菸規範和人數限制。"
+            },
+            {
+              "questionNumber": 35,
+              "question": "酒駕的新聞事件很可怕,下列何者不是酒後駕車可能造成的影響?",
+              "answerOptions": [
+                {"text": "處以罰鍰或吊銷駕照", "isCorrect": false},
+                {"text": "反應更加靈敏", "isCorrect": true},
+                {"text": "視覺範圍變窄", "isCorrect": false},
+                {"text": "酒駕事故中人的死亡或傷害。", "isCorrect": false}
+              ],
+              "rationale": "酒精會抑制中樞神經，使人反應遲鈍、判斷力下降，不可能反應更加靈敏，故此為錯誤敘述。",
+              "hint": "酒精對中樞神經的作用會讓駕駛者的反應變快還是變慢？"
+            },
+            {
+              "questionNumber": 36,
+              "question": "關於檳榔相關的描述,下列何者不正確?",
+              "answerOptions": [
+                {"text": "同時有嚼檳榔、抽菸、飲酒的人,罹患口腔癌的機率是一般人的123倍", "isCorrect": false},
+                {"text": "雌性荖藤的花蕊含有致癌物「黃樟素」", "isCorrect": false},
+                {"text": "檳榔子本身因含有檳榔鹼與酚類化合物具有致癌性", "isCorrect": false},
+                {"text": "檳榔鹼會使人興奮與心跳慢下來。", "isCorrect": true}
+              ],
+              "rationale": "檳榔鹼的興奮作用會導致「心跳加快」和心律不整，故「心跳慢下來」是錯誤的敘述。",
+              "hint": "檳榔鹼是一種生物鹼，對心臟的作用是加速還是減慢心跳？"
+            },
+            {
+              "questionNumber": 37,
+              "question": "酒駕相關法規,酒測吐氣時所含酒精濃度超過多少mg/L不但達到酒駕的標準違反道路交通管理處罰條例, 也違反刑法公共危險罪。",
+              "answerOptions": [
+                {"text": "0.15 mg/L", "isCorrect": false},
+                {"text": "0.25 mg/L", "isCorrect": true},
+                {"text": "0.03mg/L", "isCorrect": false},
+                {"text": "0.05 mg/L", "isCorrect": false}
+              ],
+              "rationale": "根據法規，吐氣酒精濃度達0.25 mg/L或血液酒精濃度達0.05%時，將違反《刑法》的公共危險罪，同時也違反《道路交通管理處罰條例》。",
+              "hint": "請問違反《刑法》公共危險罪的吐氣酒精濃度法定標準是多少？"
+            },
+            {
+              "questionNumber": 38,
+              "question": "市面上販賣的檳榔可能添加其他物質成分,而其中哪項物質會破壞口腔黏膜表皮,幫助癌細胞的滋長?",
+              "answerOptions": [
+                {"text": "荖葉", "isCorrect": false},
+                {"text": "檳榔子", "isCorrect": false},
+                {"text": "紅灰", "isCorrect": true},
+                {"text": "荖花。", "isCorrect": false}
+              ],
+              "rationale": "紅灰（生石灰或熟石灰）為強鹼性物質，加入檳榔中其鹼性作用會嚴重破壞口腔黏膜表皮，使其更容易受到檳榔子中致癌物質的傷害，從而幫助癌細胞滋長。",
+              "hint": "請問檳榔添加物中哪一種是強鹼性物質，會對口腔黏膜造成物理性和化學性刺激與破壞？"
+            },
+            {
+              "questionNumber": 39,
+              "question": "有關三手菸的敘述,何者錯誤?",
+              "answerOptions": [
+                {"text": "所產生的有毒微粒會影響兒童的認知", "isCorrect": false},
+                {"text": "菸熄滅後殘留於環境中的汙染物", "isCorrect": false},
+                {"text": "菸草燃燒不完全而產生的煙", "isCorrect": true},
+                {"text": "會影響嬰幼兒的呼吸系統。", "isCorrect": false}
+              ],
+              "rationale": "這是「二手菸」（側流菸）的部分來源，三手菸是指「殘留物」，而非燃燒過程中的「煙霧」，故此敘述錯誤。",
+              "hint": "三手菸指的是「菸熄滅後」的殘留物質，還是「燃燒中」產生的煙霧？"
+            },
+            {
+              "questionNumber": 40,
+              "question": "拒絕他人是需要勇氣及訣竅的,課文中拒絕成癮物質-反菸我做起當中,拒絕小訣竅包含哪些?\n(甲)態度溫和而堅定(乙)清楚明確說「不」(丙)必要時提出法律依據(丁)避免心虛的動作,或攻擊性的言語動作。",
+              "answerOptions": [
+                {"text": "甲乙丙丁", "isCorrect": true},
+                {"text": "乙丙丁", "isCorrect": false},
+                {"text": "乙丙", "isCorrect": false},
+                {"text": "乙丁。", "isCorrect": false}
+              ],
+              "rationale": "拒絕成癮物質的有效訣竅包括態度溫和而堅定（甲）、清楚明確說「不」（乙）、必要時提出法律依據（丙）、以及避免心虛或攻擊性的言語動作（丁）。",
+              "hint": "有效的拒絕技巧應該兼顧「語氣的堅定與否」、「內容的明確性」、「是否引用外在權威」以及「肢體語言」等要素。"
+            }
+            // 完整 40 題的 JSON 測驗資料 END
+          ]
+        };
+
+        // 測驗邏輯 (原 script.js 的內容)
+        const quizContainer = document.getElementById('quiz-container');
+
+        function buildQuiz() {
+            let output = `<h1>${quizData.quizTitle}</h1>`;
+            
+            quizData.questions.forEach((currentQuestion) => {
+                const answers = [];
+                const qNum = currentQuestion.questionNumber;
+                
+                // 遍歷所有選項
+                for(let i = 0; i < currentQuestion.answerOptions.length; i++) {
+                    const option = currentQuestion.answerOptions[i];
+                    
+                    // 使用 A, B, C, D 顯示選項
+                    const optionLetter = String.fromCharCode(65 + i); // 65 是 A 的 ASCII 碼
+                    
+                    answers.push(
+                        `<label class="answer-option">
+                            <input type="radio" name="question${qNum}" value="${optionLetter}">
+                            (${optionLetter}) ${option.text}
+                        </label>`
+                    );
+                }
+
+                // 將題目和選項加入 output
+                output += `
+                    <div class="question-block">
+                        <h2>${qNum}. ${currentQuestion.question}</h2>
+                        <div class="answers" data-question-number="${qNum}">${answers.join('')}</div>
+                        <div id="rationale${qNum}" class="rationale" style="display: none;">
+                            <!-- 解析內容將在提交後填入 -->
+                        </div>
+                    </div>
+                `;
+            });
+
+            quizContainer.innerHTML = output;
+        }
+
+        function submitQuiz() {
+            let numCorrect = 0;
+            const totalQuestions = quizData.questions.length;
+            
+            quizData.questions.forEach((currentQuestion) => {
+                const qNum = currentQuestion.questionNumber;
+                const selector = `input[name=question${qNum}]:checked`;
+                const userAnswerElement = document.querySelector(selector);
+                
+                // 取得使用者選擇的答案選項 (A, B, C, D)
+                const userAnswerLetter = userAnswerElement ? userAnswerElement.value : null;
+
+                // 找出正確答案的字母
+                let correctAnswerLetter = null;
+                currentQuestion.answerOptions.forEach((option, index) => {
+                    if (option.isCorrect) {
+                        correctAnswerLetter = String.fromCharCode(65 + index);
+                    }
+                });
+
+                // 顯示解析
+                const rationaleDiv = document.getElementById(`rationale${qNum}`);
+                rationaleDiv.style.display = 'block';
+                
+                // 檢查答案是否正確
+                if (userAnswerLetter === correctAnswerLetter) {
+                    numCorrect++;
+                    rationaleDiv.className = 'rationale correct';
+                    rationaleDiv.innerHTML = `✅ **正確！** (您選 ${userAnswerLetter})。解析：${currentQuestion.rationale || '無'}`;
+                } else {
+                    rationaleDiv.className = 'rationale incorrect';
+                    rationaleDiv.innerHTML = `❌ **錯誤！** (您選 ${userAnswerLetter || '未選'})。正確答案：**(${correctAnswerLetter})**。解析：${currentQuestion.rationale || '無'}`;
+                }
+            });
+
+            // 顯示最終結果
+            // 每題 2.5 分 (100 / 40 = 2.5)
+            const score = (numCorrect / totalQuestions) * 100;
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = `您答對了 ${numCorrect} 題，總分 ${score.toFixed(1)} 分 (共 ${totalQuestions} 題)。`;
+            resultsContainer.style.display = 'block';
+            
+            // 滾動到結果處
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 啟動測驗
+        document.addEventListener('DOMContentLoaded', buildQuiz);
+    </script>
+</body>
+</html>
